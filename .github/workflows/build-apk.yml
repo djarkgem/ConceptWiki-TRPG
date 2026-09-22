@@ -19,7 +19,7 @@ jobs:
           rm -rf project
           mkdir project
           unzip -q source-bundle.zip -d project
-          echo "=== Project ==="
+          echo "=== Project contents ==="
           ls -la project
 
       - name: Set up Java 17
@@ -28,22 +28,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Show Android environment
+      - name: Show Android SDK
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          which sdkmanager || true
-          sdkmanager --version || true
+          ls -la "$ANDROID_HOME"
+          echo "=== Platforms ==="
+          ls -la "$ANDROID_HOME/platforms" || true
+          echo "=== Build tools ==="
+          ls -la "$ANDROID_HOME/build-tools" || true
+          echo "=== NDK ==="
+          ls -la "$ANDROID_HOME/ndk" || true
+          echo "=== CMake ==="
+          ls -la "$ANDROID_HOME/cmake" || true
 
-      - name: Accept Android licenses
-        run: |
-          yes | sdkmanager --licenses >/dev/null || true
-
-      - name: Install required Android packages
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "cmake;3.22.1" "ndk;27.0.12077973"
-
-      - name: Set up Gradle
+      - name: Set up Gradle 8.11.1
         uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.11.1'
@@ -56,6 +55,7 @@ jobs:
 
       - name: Locate APK
         run: |
+          echo "=== APK files ==="
           find project -type f -name "*.apk" -print
 
       - name: Upload ConceptWiki APK
